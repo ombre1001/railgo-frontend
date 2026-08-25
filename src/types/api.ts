@@ -19,7 +19,7 @@ export interface PageData<T> {
 
 export interface UserProfile {
   id: number
-  phone: string
+  phone?: string
   nickname: string
   email?: string
   status?: string

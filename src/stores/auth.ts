@@ -45,8 +45,8 @@ export const useAuthStore = defineStore('auth', () => {
     return profile
   }
 
-  async function login(phone: string, password: string) {
-    const result = await api.auth.login({ phone, password })
+  async function login(account: string, password: string) {
+    const result = await api.auth.login({ account, password })
     token.value = result.accessToken
     refreshToken.value = result.refreshToken
     localStorage.setItem('railgo_access_token', result.accessToken)

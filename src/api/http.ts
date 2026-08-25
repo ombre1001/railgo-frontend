@@ -11,7 +11,7 @@ const http = axios.create({
 http.interceptors.request.use((config) => {
   const token = localStorage.getItem('railgo_access_token')
   const url = config.url || ''
-  const isPublicAuthRequest = /^\/auth\/(login|register|refresh)$/.test(url)
+  const isPublicAuthRequest = /^\/auth\/(login|register|refresh|email\/code)$/.test(url)
   if (token && !isPublicAuthRequest) config.headers.Authorization = `Bearer ${token}`
   else delete config.headers.Authorization
   config.headers['X-Request-Id'] = crypto.randomUUID()

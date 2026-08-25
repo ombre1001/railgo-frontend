@@ -90,7 +90,8 @@ export interface TransferTicketQuery extends TicketLocationQuery {
 
 export const api = {
   auth: {
-    login: (payload: { phone: string; password: string }) => request<AuthResponse>({ method: 'POST', url: '/auth/login', data: payload }),
+    login: (payload: { account: string; password: string }) => request<AuthResponse>({ method: 'POST', url: '/auth/login', data: payload }),
+    sendEmailCode: (payload: { email: string }) => request<void>({ method: 'POST', url: '/auth/email/code', data: payload }),
     register: (payload: Params) => request<AuthResponse>({ method: 'POST', url: '/auth/register', data: payload }),
     logout: (refreshToken: string) => request<void>({ method: 'POST', url: '/auth/logout', data: { refreshToken } })
   },

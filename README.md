@@ -1,5 +1,7 @@
 # RailGo 前端
 
+> 当前注册方式为邮箱验证码。新用户使用邮箱注册和登录，已有用户仍可使用手机号和密码登录。后端配置参见后端仓库的 `EMAIL_REGISTRATION_SETUP.md`。
+
 基于 Vue 3、TypeScript、Vite、Element Plus、Pinia、Axios 与 ECharts 的火车票售票系统前端，包含乘客端和管理端。
 
 ## 运行环境

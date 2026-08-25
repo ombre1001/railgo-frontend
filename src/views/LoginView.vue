@@ -13,9 +13,9 @@ const formRef = ref<FormInstance>()
 const loading = ref(false)
 const isAdminLogin = computed(() => route.meta.adminLogin === true)
 const wasDenied = computed(() => isAdminLogin.value && route.query.forbidden === '1')
-const form = reactive({ phone: '', password: '', agreed: true })
+const form = reactive({ account: '', password: '', agreed: true })
 const rules: FormRules = {
-  phone: [{ required: true, message: '请输入手机号', trigger: 'blur' }, { pattern: /^1\d{10}$/, message: '手机号格式不正确', trigger: 'blur' }],
+  account: [{ required: true, message: '请输入邮箱或手机号', trigger: 'blur' }],
   password: [{ required: true, message: '请输入密码', trigger: 'blur' }, { min: 8, message: '密码至少8位', trigger: 'blur' }],
   agreed: [{ validator: (_r, value, callback) => value ? callback() : callback(new Error('请先同意服务协议')), trigger: 'change' }]
 }
@@ -24,7 +24,7 @@ async function submit() {
   if (!await formRef.value?.validate().catch(() => false)) return
   loading.value = true
   try {
-    const user = await auth.login(form.phone, form.password)
+    const user = await auth.login(form.account, form.password)
     if (isAdminLogin.value && !hasAdminRole(user)) {
       await auth.logout()
       ElMessage.error('该账号在数据库中没有管理员角色，无法进入管理端')
@@ -56,7 +56,7 @@ async function submit() {
           <h2>{{ isAdminLogin ? '进入运营管理中心' : '账号密码登录' }}</h2>
           <el-alert v-if="wasDenied" class="login-alert" type="warning" :closable="false" show-icon title="请使用具有管理员角色的账号登录" />
           <el-form ref="formRef" :model="form" :rules="rules" size="large" @keyup.enter="submit">
-            <el-form-item prop="phone"><el-input v-model="form.phone" placeholder="手机号" /></el-form-item>
+            <el-form-item prop="account"><el-input v-model.trim="form.account" placeholder="邮箱或手机号" /></el-form-item>
             <el-form-item prop="password"><el-input v-model="form.password" type="password" show-password placeholder="登录密码" /></el-form-item>
             <el-form-item prop="agreed"><el-checkbox v-model="form.agreed">我已阅读并同意《服务协议》和《隐私政策》</el-checkbox></el-form-item>
             <el-button class="rg-primary" type="primary" size="large" :loading="loading" style="width:100%" @click="submit">{{ isAdminLogin ? '登录管理端' : '登录' }}</el-button>
