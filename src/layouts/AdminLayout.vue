@@ -1,12 +1,11 @@
 <script setup lang="ts">
-import { useRoute, useRouter } from 'vue-router'
+import { useRouter } from 'vue-router'
 import { DataAnalysis, OfficeBuilding, Tickets, Calendar, List, Money, TrendCharts, User, Document } from '@element-plus/icons-vue'
 import BrandLogo from '@/components/BrandLogo.vue'
 import { useAuthStore } from '@/stores/auth'
 
 const auth = useAuthStore()
 const router = useRouter()
-const route = useRoute()
 const menus = [
   { path: '/admin', label: '运营看板', icon: DataAnalysis },
   { path: '/admin/stations', label: '车站管理', icon: OfficeBuilding },
@@ -27,7 +26,13 @@ async function logout() { await auth.logout(); router.push('/admin/login') }
     <aside class="admin-sidebar">
       <div class="admin-logo"><BrandLogo light /></div>
       <nav class="admin-menu">
-        <RouterLink v-for="item in menus" :key="item.path" :to="item.path" :class="{ 'router-link-active': route.path === item.path }">
+        <RouterLink
+          v-for="item in menus"
+          :key="item.path"
+          :to="item.path"
+          active-class="router-link-matched"
+          exact-active-class="router-link-active"
+        >
           <el-icon size="19"><component :is="item.icon" /></el-icon><span>{{ item.label }}</span>
         </RouterLink>
       </nav>
