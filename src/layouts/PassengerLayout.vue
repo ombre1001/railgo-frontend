@@ -41,7 +41,6 @@ async function logout() { await auth.logout(); router.push('/') }
     <footer style="background:#10243f;color:#b8c8da;padding:38px 0">
       <div class="page-container" style="display:flex;justify-content:space-between;gap:30px;flex-wrap:wrap">
         <div><BrandLogo light /><p style="max-width:480px;line-height:1.8">RailGo 数据库课程设计。车站、车次、余票、订单和管理数据均由后端接口实时提供。</p></div>
-        <div><b style="color:#fff">快速入口</b><p>车票查询 · 我的订单 · 常用乘车人 · 管理端</p><small>© 2026 RailGo Course Project</small></div>
       </div>
     </footer>
   </div>
