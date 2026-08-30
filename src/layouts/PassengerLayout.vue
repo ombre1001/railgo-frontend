@@ -16,6 +16,7 @@ async function logout() { await auth.logout(); router.push('/') }
         <RouterLink to="/"><BrandLogo /></RouterLink>
         <nav class="header-nav">
           <RouterLink to="/">首页</RouterLink>
+          <RouterLink to="/system">系统详情</RouterLink>
           <RouterLink to="/trains">车票查询</RouterLink>
           <RouterLink to="/orders">我的订单</RouterLink>
           <el-dropdown v-if="auth.isLoggedIn">

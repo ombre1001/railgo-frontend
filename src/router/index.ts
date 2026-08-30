@@ -6,6 +6,7 @@ const routes: RouteRecordRaw[] = [
     path: '/', component: () => import('@/layouts/PassengerLayout.vue'),
     children: [
       { path: '', name: 'home', component: () => import('@/views/HomeView.vue') },
+      { path: 'system', name: 'system-overview', component: () => import('@/views/SystemOverviewView.vue') },
       { path: 'trains', name: 'trains', component: () => import('@/views/TicketListView.vue') },
       { path: 'booking', name: 'booking', component: () => import('@/views/BookingView.vue'), meta: { requiresAuth: true } },
       { path: 'payment/:orderId', name: 'payment', component: () => import('@/views/PaymentView.vue'), meta: { requiresAuth: true } },
