@@ -22,6 +22,55 @@ const technologies = [
   ['可视化', 'ECharts · vue-echarts'],
   ['接口规范', 'RESTful API · JWT 双令牌 · 统一响应体']
 ]
+
+const stateMachines = [
+  {
+    title: '订单状态', table: 'ticket_order',
+    transitions: [
+      ['PENDING_PAYMENT', '支付成功', 'PAID'],
+      ['PENDING_PAYMENT', '主动取消', 'CANCELLED'],
+      ['PENDING_PAYMENT', '15 分钟超时', 'EXPIRED'],
+      ['PAID', '部分退票', 'PARTIALLY_REFUNDED'],
+      ['PAID / PARTIALLY_REFUNDED', '全部退票', 'REFUNDED']
+    ]
+  },
+  {
+    title: '区间库存', table: 'seat_segment_inventory',
+    transitions: [
+      ['AVAILABLE', '下单锁座', 'LOCKED'],
+      ['LOCKED', '支付出票', 'SOLD'],
+      ['LOCKED', '取消或超时', 'AVAILABLE'],
+      ['SOLD', '退票或完成改签', 'AVAILABLE']
+    ]
+  },
+  {
+    title: '车票状态', table: 'order_item',
+    transitions: [
+      ['LOCKED', '支付出票', 'ISSUED'],
+      ['LOCKED', '订单取消', 'CANCELLED'],
+      ['ISSUED', '退票完成', 'REFUNDED'],
+      ['ISSUED', '改签完成', 'CHANGED'],
+      ['CHANGE_LOCKED', '确认新票', 'ISSUED']
+    ]
+  },
+  {
+    title: '支付与改签', table: 'payment_record / change_record',
+    transitions: [
+      ['PROCESSING', '确认支付', 'SUCCESS'],
+      ['PROCESSING', '订单过期', 'CLOSED'],
+      ['WAITING_PAYMENT', '补差价', 'COMPLETED'],
+      ['WAITING_CONFIRMATION', '确认改签', 'COMPLETED'],
+      ['等待中', '取消或超时', 'CANCELLED / EXPIRED']
+    ]
+  }
+]
+
+const transactionActions = [
+  ['下单', '创建订单和车票；按座位、运行实例与站序锁定全部经过区间。'],
+  ['支付', '库存 LOCKED→SOLD、车票 LOCKED→ISSUED、订单→PAID、流水→SUCCESS。'],
+  ['退票', '释放已售区间、车票→REFUNDED、生成退票及退款流水、汇总订单状态。'],
+  ['改签', '先锁新票；确认后释放旧票、售出新票，并记录补款或退款差额。']
+]
 </script>
 
 <template>
@@ -70,6 +119,51 @@ const technologies = [
           <div class="flow-line" v-if="index < steps.length - 1" />
           <h3>{{ step[1] }}</h3><p>{{ step[2] }}</p>
         </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="page-section overview-section state-section">
+    <div class="page-container">
+      <div class="section-title">
+        <div><h2>业务状态机</h2><p>每一次操作都有明确的前置状态与目标状态，非法流转由后端拒绝</p></div>
+        <span class="state-legend"><i /> 状态更新均校验原状态</span>
+      </div>
+      <div class="state-machine-grid">
+        <article v-for="machine in stateMachines" :key="machine.title" class="state-machine-card surface">
+          <header><div><h3>{{ machine.title }}</h3><code>{{ machine.table }}</code></div><span>{{ machine.transitions.length }} 条规则</span></header>
+          <div class="transition-list">
+            <div v-for="transition in machine.transitions" :key="transition.join('-')" class="transition-row">
+              <b class="state-pill state-from">{{ transition[0] }}</b>
+              <span class="transition-action"><small>{{ transition[1] }}</small><i>→</i></span>
+              <b class="state-pill state-to">{{ transition[2] }}</b>
+            </div>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="overview-database-section">
+    <div class="page-container">
+      <div class="section-title database-heading"><div><p class="overview-kicker">DATABASE BUSINESS LOGIC</p><h2>区间库存与事务一致性</h2><p>不是按整趟列车扣减数字，而是锁定具体座位经过的每一段线路</p></div></div>
+      <div class="database-showcase">
+        <div class="segment-demo">
+          <div class="segment-route"><span>北京</span><i /><span>济南</span><i /><span>南京</span><i /><span>上海</span></div>
+          <div class="seat-segments">
+            <b>01A</b><span class="segment sold">SOLD</span><span class="segment sold">SOLD</span><span class="segment available">AVAILABLE</span>
+          </div>
+          <p>购买“北京→南京”只占用前两个区间，“南京→上海”仍可复用同一座位。</p>
+          <div class="lock-note"><Lock /> 锁座时使用 <code>SELECT ... FOR UPDATE</code> 锁定区间行，并再次检查状态与更新行数。</div>
+        </div>
+        <div class="transaction-panel">
+          <h3>一次业务操作，同一事务提交</h3>
+          <div v-for="(action, index) in transactionActions" :key="action[0]" class="transaction-row">
+            <span>{{ String(index + 1).padStart(2, '0') }}</span>
+            <div><b>{{ action[0] }}</b><p>{{ action[1] }}</p></div>
+          </div>
+          <footer>任一步骤失败，相关数据库修改全部回滚，避免订单、库存与资金状态不一致。</footer>
+        </div>
       </div>
     </div>
   </section>
