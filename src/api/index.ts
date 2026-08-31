@@ -181,8 +181,6 @@ export const api = {
         method: 'POST',
         url: '/admin/train-sync',
         data: payload,
-        // 车次同步耗时取决于日期范围和上游数据源，不使用全局 15 秒超时。
-        // Axios 的 timeout 设为 0 表示持续等待，直到同步完成或连接真正失败。
         timeout: 0
       }),
 
@@ -212,9 +210,7 @@ export const api = {
       request<BatchInitializeInventoryResult>({
         method: 'POST',
         url: '/admin/train-runs/inventory/init-batch',
-        data: payload,
-        // 批量生成区间库存可能处理大量运行计划，不使用全局 15 秒超时。
-        timeout: 0
+        data: payload
       }),
     inventory: (id: number) => request<Params[]>({ url: `/admin/train-runs/${id}/inventory` }),
 
