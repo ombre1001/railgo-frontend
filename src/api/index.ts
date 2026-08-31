@@ -212,7 +212,9 @@ export const api = {
       request<BatchInitializeInventoryResult>({
         method: 'POST',
         url: '/admin/train-runs/inventory/init-batch',
-        data: payload
+        data: payload,
+        // 批量生成区间库存可能处理大量运行计划，不使用全局 15 秒超时。
+        timeout: 0
       }),
     inventory: (id: number) => request<Params[]>({ url: `/admin/train-runs/${id}/inventory` }),
 
